@@ -1,1 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vue.js and Socket.IO Realtime Data</title>
+  <!-- Vue.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <!-- Socket.IO Client CDN -->
+  <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <h1>Real-Time Data from Airtable</h1>
+    <ul>
+      <li v-for="record in records" :key="record.id">{{ record.fields.Name }}</li>
+    </ul>
+  </div>
 
+  <script>
+    // Initialize Socket.IO client and Vue instance
+    const socket = io('https://glorious-dollop-j4x6gq5rv9rhpgxj-3000.app.github.dev/data'); // Point to the backend server
+
+    new Vue({
+      el: '#app',
+      data: {
+        records: []  // Store Airtable records here
+      },
+      created() {
+        // Request initial data load when component is created
+        socket.emit('getInitialData');
+
+        // Listen for real-time updates from the server
+        socket.on('dataUpdated', (newData) => {
+          this.records = newData.records;
+        });
+      }
+    });
+  </script>
+</body>
+</html>
